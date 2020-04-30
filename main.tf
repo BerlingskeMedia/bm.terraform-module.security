@@ -1,3 +1,4 @@
+// allow internet incomming traffic
 resource "aws_security_group" "alb_sg" {
   name        = "${var.label}-alb"
   description = "Security group for Loadbalancer ${var.name}"
@@ -17,37 +18,22 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags = var.tags
+  tags = merge(var.tags, { "Name" = "${var.label}-alb" })
 }
 
 resource "aws_security_group" "ecs_sg" {
   name        = "${var.label}-ecs"
   description = "Security group for ECS ${var.name}"
   vpc_id      = var.vpc_id
-
-  ingress {
-    description     = "Connections from ALB"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+  dynamic "ingress" {
+    for_each = var.ecs_ports
+    content {
+      description     = "Connections from ALB"
+      from_port       = ingress.value
+      to_port         = ingress.value
+      protocol        = "tcp"
+      security_groups = [aws_security_group.alb_sg.id]
+    }
   }
-  tags = var.tags
-}
-
-
-resource "aws_security_group" "rds_sg" {
-  name        = "${var.label}-rds"
-  description = "Security group for RDS ${var.name}"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    description     = "Connect from ECS"
-    from_port       = var.rds_port
-    to_port         = var.rds_port
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ecs_sg.id]
-  }
-
-  tags = var.tags
+  tags = merge(var.tags, { "Name" = "${var.label}-ecs" })
 }

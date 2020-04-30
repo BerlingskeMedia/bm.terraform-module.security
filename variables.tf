@@ -28,7 +28,8 @@ variable "vpc_id" {
   description = "VPC ID"
 }
 
-variable "rds_port" {
-  type        = string
-  description = "Port on which RDS accepts connections"
+variable "ecs_ports" {
+  type        = list(string)
+  description = "Create separate SG for each given port"
 }
+
