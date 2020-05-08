@@ -1,9 +1,9 @@
 output "alb_sg_id" {
   description = "Loadbalancer Security Group ID"
-  value       = aws_security_group.alb_sg.id
+  value       = join("", aws_security_group.alb_sg.*.id)
 }
 
 output "ecs_sg_id" {
   description = "ECS Security Group ID"
-  value       = aws_security_group.ecs_sg.id
+  value       = join("", aws_security_group.ecs_sg.*.id)
 }

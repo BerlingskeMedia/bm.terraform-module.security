@@ -1,5 +1,6 @@
 // allow internet incomming traffic
 resource "aws_security_group" "alb_sg" {
+  count       = var.enabled && var.alb_enabled ? 1 : 0
   name        = "${var.label}-alb"
   description = "Security group for Loadbalancer ${var.name}"
   vpc_id      = var.vpc_id
@@ -22,6 +23,7 @@ resource "aws_security_group" "alb_sg" {
 }
 
 resource "aws_security_group" "ecs_sg" {
+  count       = var.enabled && var.ecs_enabled ? 1 : 0
   name        = "${var.label}-ecs"
   description = "Security group for ECS ${var.name}"
   vpc_id      = var.vpc_id
